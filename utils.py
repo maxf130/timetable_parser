@@ -13,9 +13,18 @@ def make_weeks(weeksreader):
 
     return weeks
 
-def parse(ttreader, modules, defined_weeks):
+def parse(ttreader, modules, defined_weeks, errors):
     sessions = []
     for row in ttreader:
+        if not ''.join(row).strip():
+            continue;
+
+        try:
+            check_syntax(row)
+        except ValueError as error:
+            errors.append(';'.join(row) + '\n' + str(error))
+            continue;
+
         module_codes = (row[conf.MODULE_CODE_ROW]
                         .replace('"', '').split(','))
         matches = set(modules).intersection(module_codes) 
@@ -58,3 +67,42 @@ def session_date(defined_weeks, week, day):
         return weekstart + timedelta(days=3)
     if 'Fri' in day:
         return weekstart + timedelta(days=4)
+
+
+def check_syntax(row):
+    if not re.match(r'.+', row[conf.TITLE_ROW]):
+        raise ValueError('Row ' + str(conf.TITLE_ROW) + 
+                         ' does not contain a valid title.') 
+
+    if not re.match(r'(\w{2}\d{4},?)+', row[conf.MODULE_CODE_ROW]):
+        raise ValueError('Row ' + str(conf.MODULE_CODE_ROW) +
+                         ' does not contain a valid module code.')
+
+    if not re.match(r'\w{3}', row[conf.DAY_ROW]):
+        raise ValueError('Row ' +str(conf.DAY_ROW) +
+                         ' does not contain a valid day.')
+
+    if not re.match(r'\d{2}:\d{2}', row[conf.START_ROW]):
+        raise ValueError('Row ' + str(conf.START_ROW) +
+                         ' does not contain a valid time.')
+
+    if not re.match(r'\d{2}:\d{2}', row[conf.END_ROW]):
+        raise ValueError('Row ' + str(conf.END_ROW) +
+                         ' does not contain a valid time.')
+
+    if not re.match(r'.+', row[conf.KIND_ROW]):
+        raise ValueError('Row ' + str(conf.KIND_ROW) + 
+                         ' does not contain a valid session type.') 
+
+    if not re.match(r'Week(s)?\s*(\d+(-\d+)?,?)+', row[conf.WEEKS_ROW]):
+        raise ValueError('Row ' + str(conf.WEEKS_ROW) +
+                         ' does not contain a valid week definition.')
+
+    if not re.match(r'.+', row[conf.LECTURER_ROW]):
+        raise ValueError('Row ' + str(conf.LECTURER_ROW) + 
+                         ' does not contain a valid Lecturer.') 
+
+    if not re.match(r'.+', row[conf.LOCATION_ROW]):
+        print(row[conf.LOCATION_ROW])
+        raise ValueError('Row ' + str(conf.LOCATION_ROW) + 
+                         ' does not contain a valid location.') 
