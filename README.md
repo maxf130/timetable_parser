@@ -9,3 +9,6 @@ A parser for the University of Leicester Computer Science department timetable.
 
 ## Contributing
 Send me an e-mail or fork the project.
+
+## Contact
+You can reach me at mxf130@gmail.com
