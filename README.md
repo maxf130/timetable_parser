@@ -11,4 +11,4 @@ A parser for the University of Leicester Computer Science department timetable.
 Send me an e-mail or fork the project.
 
 ## Contact
-You can reach me at mxf130@gmail.com
+You can reach me at maxf130@gmail.com
